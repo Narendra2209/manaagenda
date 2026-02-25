@@ -49,6 +49,25 @@ async def list_clients(admin: dict = Depends(get_current_admin)):
     return await get_users_by_role("CLIENT")
 
 
+@router.delete("/users/{user_id}")
+async def delete_user(user_id: str, admin: dict = Depends(get_current_admin)):
+    db = get_database()
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user["role"] == "ADMIN":
+        raise HTTPException(status_code=400, detail="Cannot delete admin users")
+
+    # Remove from all assigned projects
+    await db.projects.update_many(
+        {"assigned_employees": user_id},
+        {"$pull": {"assigned_employees": user_id}},
+    )
+
+    await db.users.delete_one({"_id": ObjectId(user_id)})
+    return {"message": "User deleted successfully"}
+
+
 # ── Services ─────────────────────────────────────────
 @router.post("/services", response_model=ServiceResponse)
 async def create_service(
@@ -151,6 +170,28 @@ async def assign_employees_to_project(
     admin: dict = Depends(get_current_admin),
 ):
     return await assign_employees(project_id, body.employee_ids)
+
+
+@router.put("/projects/{project_id}/unassign")
+async def unassign_employee_from_project(
+    project_id: str,
+    body: dict,
+    admin: dict = Depends(get_current_admin),
+):
+    db = get_database()
+    employee_id = body.get("employee_id")
+    if not employee_id:
+        raise HTTPException(status_code=400, detail="employee_id is required")
+
+    project = await db.projects.find_one({"_id": ObjectId(project_id)})
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    await db.projects.update_one(
+        {"_id": ObjectId(project_id)},
+        {"$pull": {"assigned_employees": employee_id}},
+    )
+    return {"message": "Employee unassigned successfully"}
 
 
 # ── Dashboard Stats ──────────────────────────────────

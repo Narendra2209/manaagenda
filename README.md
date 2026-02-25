@@ -1,4 +1,4 @@
-# 🚀 ProjectHub — SaaS Project Management System
+# 🚀 Narendra Tech Solutions — Software Company Management Portal
 
 <div align="center">
 
@@ -8,66 +8,83 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
-A full-stack, role-based project management platform built with **FastAPI**, **React + TypeScript**, and **MongoDB Atlas**.
+A full-stack, role-based software company management portal built with **FastAPI**, **React + TypeScript**, and **MongoDB Atlas**.
+
+**🌐 Live Demo:** [https://manaagenda-1.onrender.com](https://manaagenda-1.onrender.com)
+
+**🔗 Backend API:** [https://manaagenda-jrkp.onrender.com](https://manaagenda-jrkp.onrender.com)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## 🔐 Test Login Credentials
 
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Environment Setup](#-environment-setup)
-- [Running the Application](#-running-the-application)
-- [API Endpoints](#-api-endpoints)
-- [Deployment](#-deployment)
+| Role | Email | Password |
+|------|-------|----------|
+| **Admin** | `admin@example.com` | `admin123` |
+| **Employee** | *(Created via Admin dashboard)* | *(Set during creation)* |
+| **Client** | *(Created via Admin dashboard)* | *(Set during creation)* |
+
+> After logging in as Admin, create Employee and Client users from the "Users" tab to test all roles.
 
 ---
 
 ## ✨ Features
 
 ### 🔐 Authentication
-- JWT-based authentication with 24-hour token expiry
-- Role-based access control (Admin, Employee, Client)
+- JWT-based authentication with role-based access control
 - Protected routes with automatic redirects
+- Three roles: Admin, Employee, Client
 
-### 👑 Admin Dashboard
-- Create and manage employees & clients
+### 👑 Admin Portal
+- Create/remove employees and clients
 - Create and manage services
-- Approve/reject service requests (auto-creates projects on approval)
-- Assign employees to projects
-- Platform-wide analytics and statistics
+- Approve/reject client service requests (auto-creates projects on approval)
+- Assign/unassign employees to projects
+- Dashboard with platform-wide statistics
+- Messaging with employees and clients
+- Edit profile with password change
 
-### 👷 Employee Dashboard
+### 👷 Employee Portal
 - View assigned projects
 - Update project status (Not Started → In Progress → Completed)
-- Progress tracking with visual indicators
+- Message admin and assigned clients
+- Edit profile
+- **Cannot** unassign themselves from projects
 
-### 🏢 Client Dashboard
+### 🏢 Client Portal
 - Browse available services
-- Submit service requests
-- Track project progress
+- Request new services
+- View request status and track projects
+- Message admin and assigned employees
+- Edit profile
 
-### 💬 Messaging
-- Send messages between users
-- View message history
+### 💬 Messaging System
+- Admin ↔ Employee messaging
+- Admin ↔ Client messaging
+- Client ↔ Assigned Employee messaging
+- Role-based contact filtering
+
+### 📊 Service Request Flow
+```
+Client requests service → Admin approves → Project auto-created → Admin assigns employees
+```
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer       | Technology                                          |
-| ----------- | --------------------------------------------------- |
-| **Backend** | FastAPI, Python 3.12+, Motor (async MongoDB driver) |
-| **Frontend**| React 18, TypeScript, Vite                          |
-| **Database**| MongoDB Atlas                                       |
-| **Auth**    | JWT (python-jose), bcrypt (passlib)                 |
-| **HTTP**    | Axios with interceptors                             |
-| **Routing** | React Router v6                                     |
-| **State**   | React Context API                                   |
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | FastAPI, Python 3.11, Motor (async MongoDB driver) |
+| **Frontend** | React 18, TypeScript, Vite |
+| **Database** | MongoDB Atlas |
+| **Authentication** | JWT (python-jose), bcrypt (passlib) |
+| **HTTP Client** | Axios with interceptors |
+| **Routing** | React Router v6 |
+| **State Management** | React Context API |
+| **Deployment** | Render (Backend + Frontend) |
 
 ---
 
@@ -80,32 +97,78 @@ project-root/
 │   ├── app/
 │   │   ├── main.py                 # FastAPI app entry point
 │   │   ├── core/
-│   │   │   ├── config.py           # Pydantic settings
-│   │   │   └── security.py         # JWT & password utilities
+│   │   │   ├── config.py           # Pydantic settings management
+│   │   │   └── security.py         # JWT auth, password hashing, role guards
 │   │   ├── db/
-│   │   │   └── mongodb.py          # Motor connection manager
+│   │   │   └── mongodb.py          # Motor async connection manager
 │   │   ├── models/                 # MongoDB document serializers
-│   │   ├── schemas/                # Pydantic request/response models
+│   │   │   ├── user_model.py
+│   │   │   ├── service_model.py
+│   │   │   ├── project_model.py
+│   │   │   └── message_model.py
+│   │   ├── schemas/                # Pydantic request/response schemas
+│   │   │   ├── user_schema.py
+│   │   │   ├── service_schema.py
+│   │   │   ├── project_schema.py
+│   │   │   └── message_schema.py
 │   │   ├── services/               # Business logic layer
+│   │   │   ├── auth_service.py
+│   │   │   ├── user_service.py
+│   │   │   ├── project_service.py
+│   │   │   └── message_service.py
 │   │   └── routers/                # API route handlers
+│   │       ├── auth.py             # Login + profile management
+│   │       ├── admin.py            # Admin CRUD + dashboard
+│   │       ├── employee.py         # Employee projects + status
+│   │       ├── client.py           # Client services + requests
+│   │       └── messages.py         # Messaging + contacts
+│   ├── main.py                     # Root entry point for deployment
 │   ├── seed_admin.py               # Admin user seeder
 │   ├── requirements.txt
-│   └── .env.example
+│   ├── .env.example
+│   └── .python-version
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── main.tsx                # React entry point
-│   │   ├── App.tsx                 # Router & protected routes
-│   │   ├── context/AuthContext.tsx  # Auth state management
-│   │   ├── services/api.ts         # Axios instance
-│   │   ├── components/             # Reusable UI components
-│   │   └── pages/                  # Page components
+│   │   ├── App.tsx                 # Router configuration
+│   │   ├── index.css               # Complete design system
+│   │   ├── context/
+│   │   │   └── AuthContext.tsx      # Auth state management
+│   │   ├── services/
+│   │   │   └── api.ts              # Axios instance with JWT
+│   │   ├── components/
+│   │   │   ├── Navbar.tsx
+│   │   │   └── ProtectedRoute.tsx
+│   │   └── pages/
+│   │       ├── Login.tsx
+│   │       ├── AdminDashboard.tsx
+│   │       ├── EmployeeDashboard.tsx
+│   │       └── ClientDashboard.tsx
 │   ├── package.json
 │   └── index.html
 │
+├── render.yaml                     # Render deployment blueprint
 ├── .gitignore
 └── README.md
 ```
+
+---
+
+## 🗄 Database Design
+
+### Collections
+
+| Collection | Description | Key Fields |
+|-----------|-------------|------------|
+| `users` | All users (admin, employees, clients) | name, email, password (hashed), role |
+| `services` | Available services | name, description, created_at |
+| `service_requests` | Client service requests | service_id, client_id, status, message |
+| `projects` | Active projects | name, description, client_id, assigned_employees, status, created_at |
+| `messages` | User messages | sender_id, receiver_id, content, created_at |
+
+### Indexes
+- `users.email` — unique index for fast lookups and duplicate prevention
 
 ---
 
@@ -118,18 +181,14 @@ project-root/
 - **MongoDB Atlas** account (or local MongoDB)
 - **Git**
 
-### Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Narendra2209/manaagenda.git
 cd manaagenda
 ```
 
----
-
-## ⚙ Environment Setup
-
-### 1. Backend Environment
+### 2. Backend Setup
 
 ```bash
 cd backend
@@ -147,14 +206,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment Variables
+### 3. Configure Environment
 
 ```bash
-# Copy the example env file
 cp .env.example .env
 ```
 
-Edit `.env` with your values:
+Edit `.env` with your MongoDB Atlas connection string:
 
 ```env
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/saas_pm?retryWrites=true&w=majority
@@ -162,118 +220,113 @@ SECRET_KEY=your-super-secret-key-here
 ALGORITHM=HS256
 ```
 
-> ⚠️ **Important:** Make sure your MongoDB Atlas cluster has your IP whitelisted under **Network Access**.
+> ⚠️ Make sure your MongoDB Atlas cluster has your IP whitelisted under **Network Access**.
 
-### 3. Seed Admin User
+### 4. Seed Admin User
 
 ```bash
 python seed_admin.py
 ```
 
-This creates the initial admin account:
-- **Email:** `admin@example.com`
-- **Password:** `admin123`
+Creates: `admin@example.com` / `admin123`
 
-### 4. Frontend Setup
+### 5. Frontend Setup
 
 ```bash
 cd ../frontend
-
-# Install dependencies
 npm install
 ```
 
----
+### 6. Run the Application
 
-## ▶ Running the Application
-
-### Start Backend (Terminal 1)
-
+**Terminal 1 — Backend:**
 ```bash
 cd backend
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-Backend API will be available at: `http://localhost:8000`  
-Swagger docs at: `http://localhost:8000/docs`
-
-### Start Frontend (Terminal 2)
-
+**Terminal 2 — Frontend:**
 ```bash
 cd frontend
 npm run dev
 ```
 
-Frontend will be available at: `http://localhost:5173`
+- Frontend: [http://localhost:5173](http://localhost:5173)
+- Backend API: [http://localhost:8000](http://localhost:8000)
+- Swagger Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
 ## 📡 API Endpoints
 
 ### Authentication
-| Method | Endpoint              | Description     |
-| ------ | --------------------- | --------------- |
-| POST   | `/api/auth/login`     | User login      |
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| POST | `/api/auth/login` | User login |
+| GET | `/api/auth/profile` | Get current user profile |
+| PUT | `/api/auth/profile` | Update profile + password |
 
 ### Admin (🔒 Admin only)
-| Method | Endpoint                                      | Description               |
-| ------ | --------------------------------------------- | ------------------------- |
-| POST   | `/api/admin/users`                            | Create employee/client    |
-| GET    | `/api/admin/users`                            | List all users            |
-| GET    | `/api/admin/users/employees`                  | List employees            |
-| GET    | `/api/admin/users/clients`                    | List clients              |
-| POST   | `/api/admin/services`                         | Create service            |
-| GET    | `/api/admin/services`                         | List services             |
-| GET    | `/api/admin/service-requests`                 | List service requests     |
-| PUT    | `/api/admin/service-requests/:id/approve`     | Approve & create project  |
-| PUT    | `/api/admin/service-requests/:id/reject`      | Reject request            |
-| GET    | `/api/admin/projects`                         | List all projects         |
-| PUT    | `/api/admin/projects/:id/assign`              | Assign employees          |
-| GET    | `/api/admin/stats`                            | Dashboard statistics      |
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| POST | `/api/admin/users` | Create employee/client |
+| GET | `/api/admin/users` | List all users |
+| DELETE | `/api/admin/users/:id` | Delete user |
+| GET | `/api/admin/users/employees` | List employees |
+| GET | `/api/admin/users/clients` | List clients |
+| POST | `/api/admin/services` | Create service |
+| GET | `/api/admin/services` | List services |
+| GET | `/api/admin/service-requests` | List service requests |
+| PUT | `/api/admin/service-requests/:id/approve` | Approve & create project |
+| PUT | `/api/admin/service-requests/:id/reject` | Reject request |
+| GET | `/api/admin/projects` | List all projects |
+| PUT | `/api/admin/projects/:id/assign` | Assign employees |
+| PUT | `/api/admin/projects/:id/unassign` | Unassign employee |
+| GET | `/api/admin/stats` | Dashboard statistics |
 
 ### Employee (🔒 Employee only)
-| Method | Endpoint                                 | Description            |
-| ------ | ---------------------------------------- | ---------------------- |
-| GET    | `/api/employee/projects`                 | View assigned projects |
-| PUT    | `/api/employee/projects/:id/status`      | Update project status  |
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| GET | `/api/employee/projects` | View assigned projects |
+| PUT | `/api/employee/projects/:id/status` | Update project status |
 
 ### Client (🔒 Client only)
-| Method | Endpoint                          | Description            |
-| ------ | --------------------------------- | ---------------------- |
-| GET    | `/api/client/services`            | Browse services        |
-| POST   | `/api/client/service-requests`    | Request a service      |
-| GET    | `/api/client/service-requests`    | View my requests       |
-| GET    | `/api/client/projects`            | View my projects       |
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| GET | `/api/client/services` | Browse services |
+| POST | `/api/client/service-requests` | Request a service |
+| GET | `/api/client/service-requests` | View my requests |
+| GET | `/api/client/projects` | View my projects |
 
 ### Messages (🔒 Authenticated)
-| Method | Endpoint            | Description         |
-| ------ | ------------------- | ------------------- |
-| POST   | `/api/messages/`    | Send a message      |
-| GET    | `/api/messages/`    | Get my messages     |
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| POST | `/api/messages/` | Send a message |
+| GET | `/api/messages/` | Get my messages |
+| GET | `/api/messages/contacts` | Get available contacts |
 
 ---
 
 ## 🌐 Deployment
 
-### Backend (Render / Railway / AWS)
+The application is deployed on **Render**:
 
-1. Set environment variables on your hosting platform
-2. Use the start command:
-   ```bash
-   uvicorn app.main:app --host 0.0.0.0 --port $PORT
-   ```
-3. Update CORS origins in `app/main.py` to include your frontend URL
+- **Frontend:** Static site with `npm run build` → `dist/`
+- **Backend:** Web service with `uvicorn main:app --host 0.0.0.0 --port $PORT`
 
-### Frontend (Vercel / Netlify)
+### Environment Variables (Render)
 
-1. Set the build command: `npm run build`
-2. Set the output directory: `dist`
-3. Update `src/services/api.ts` with your production API URL
+**Backend:**
+| Key | Description |
+|-----|-------------|
+| `MONGO_URI` | MongoDB Atlas connection string |
+| `SECRET_KEY` | JWT secret key |
+| `ALGORITHM` | `HS256` |
 
-### MongoDB Atlas
-
-1. Whitelist your deployment server's IP (or use `0.0.0.0/0` for all)
-2. Use a dedicated database user with limited permissions
+**Frontend:**
+| Key | Description |
+|-----|-------------|
+| `VITE_API_URL` | Backend API URL (e.g., `https://manaagenda-jrkp.onrender.com/api`) |
 
 ---
 

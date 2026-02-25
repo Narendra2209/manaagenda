@@ -52,9 +52,9 @@ const Login: React.FC = () => {
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <h1>ProjectHub</h1>
+                        <h1>Narendra Tech Solutions</h1>
                     </div>
-                    <p className="login-subtitle">SaaS Project Management System</p>
+                    <p className="login-subtitle">Software Company Management Portal</p>
                     <div className="login-features">
                         <div className="login-feature">
                             <span className="feature-icon">📊</span>

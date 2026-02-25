@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
                         </linearGradient>
                     </defs>
                 </svg>
-                <span className="navbar-title">ProjectHub</span>
+                <span className="navbar-title">Narendra Tech Solutions</span>
             </div>
             <div className="navbar-right">
                 <span className="navbar-user">{userName}</span>
