@@ -104,7 +104,7 @@ const AdminDashboard: React.FC = () => {
         if (!employeeId) return;
         try {
             const project = projects.find(p => p.id === projectId);
-            const currentEmps = project?.assigned_employees || [];
+            const currentEmps = project?.assigned_employees ?? [];
             if (currentEmps.includes(employeeId)) { showAlert('error', 'Already assigned'); return; }
             await api.put(`/admin/projects/${projectId}/assign`, { employee_ids: [...currentEmps, employeeId] });
             showAlert('success', 'Employee assigned!');
@@ -189,8 +189,10 @@ const AdminDashboard: React.FC = () => {
                         ].map(s => (
                             <div className="stat-card" key={s.label}>
                                 <div className="stat-icon">{s.icon}</div>
-                                <div className="stat-value">{s.value ?? '—'}</div>
-                                <div className="stat-label">{s.label}</div>
+                                <div className="stat-info">
+                                    <div className="stat-value">{s.value ?? '—'}</div>
+                                    <div className="stat-label">{s.label}</div>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -335,9 +337,9 @@ const AdminDashboard: React.FC = () => {
                                             <p className="project-meta"><strong>Created:</strong> {new Date(p.created_at).toLocaleDateString()}</p>
                                             <div className="project-employees">
                                                 <strong>Assigned:</strong>
-                                                {p.assigned_employees.length === 0 ? <span className="text-muted"> None</span> : (
+                                                {(p.assigned_employees || []).length === 0 ? <span className="text-muted"> None</span> : (
                                                     <div className="employee-chips">
-                                                        {p.assigned_employees.map(eid => (
+                                                        {(p.assigned_employees || []).map(eid => (
                                                             <span key={eid} className="chip">
                                                                 {getEmployeeName(eid)}
                                                                 <button className="chip-remove" onClick={() => handleUnassign(p.id, eid)} title="Unassign">×</button>
@@ -349,7 +351,7 @@ const AdminDashboard: React.FC = () => {
                                             <div className="project-actions">
                                                 <select className="status-select" defaultValue="" onChange={e => handleAssign(p.id, e.target.value)}>
                                                     <option value="" disabled>+ Assign Employee</option>
-                                                    {employees.filter(emp => !p.assigned_employees.includes(emp.id)).map(emp => (
+                                                    {employees.filter(emp => !(p.assigned_employees || []).includes(emp.id)).map(emp => (
                                                         <option key={emp.id} value={emp.id}>{emp.name}</option>
                                                     ))}
                                                 </select>
